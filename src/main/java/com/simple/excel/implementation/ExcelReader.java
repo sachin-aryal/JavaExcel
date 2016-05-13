@@ -26,7 +26,7 @@ public class ExcelReader extends AbstractExcelOperator{
     JSONObject object;
 
     @Override
-    public void processFile(ExcelField excelField){
+    public void processFile(){
         lists = new JSONArray[excelField.getTotalColumn()];
         object = new JSONObject();
 
@@ -57,7 +57,7 @@ public class ExcelReader extends AbstractExcelOperator{
                             }
                         }
                     }
-                }else if (rowNUmber > 1) {
+                }else if (rowNUmber >= 1) {
                     int index = 0;
                     for (String cellName : excelField.getColumnMaps().keySet()) {
                         if (requiredCells.keySet().contains(cellName)) {

@@ -1,6 +1,5 @@
 package com.simple.excel.implementation;
 
-import com.simple.pozo.ExcelField;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -9,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Author: SACHIN
@@ -16,19 +16,14 @@ import java.util.Map;
  */
 public class ExcelColumnMerger extends AbstractExcelOperator{
 
-    private ExcelOperator excelOperator;
-    private ExcelField excelField;
     private String columnsToBeMerged;
 
-    public ExcelColumnMerger(ExcelOperator excelOperator,ExcelField excelField,String columnsToBeMerged){
-        this.excelOperator=excelOperator;
-        this.excelField=excelField;
+    public ExcelColumnMerger(String columnsToBeMerged){
         this.columnsToBeMerged=columnsToBeMerged.trim();
     }
 
     @Override
     public void mergeColumns() {
-
         List<String> mergedColumns = new LinkedList<>();
         List<String> allColumns = new LinkedList<>();
         List<String> mergedColumnsIndex = new LinkedList<>();
@@ -77,7 +72,7 @@ public class ExcelColumnMerger extends AbstractExcelOperator{
 
                 } catch (Exception ex) {
                     allData[headIndex].add("");
-                    System.out.println("Writing space");
+//                    System.out.println("Writing space");
                 }
             }
             mergedColumns.add(mergedCellString.toString());
@@ -86,12 +81,18 @@ public class ExcelColumnMerger extends AbstractExcelOperator{
                 allColumns.remove(Integer.parseInt(eachCols));
                 allColumns.add(Integer.parseInt(eachCols),"");
             }
-            mergeData.put(cellName, allData[headIndex]);
+            if(mergeData.keySet().contains(cellName)){
+                mergeData.put(cellName+"-"+headIndex, allData[headIndex]);
+            }else{
+                mergeData.put(cellName, allData[headIndex]);
+            }
             headIndex++;
         }
         fullData.put("mergeData",mergeData);
 
-        for (String cellName : allColumns) {
+        int dupIndex=0;
+        List<String> all = allColumns.stream().collect(Collectors.toList());
+        for (String cellName : all) {
             index = allColumns.indexOf(cellName);
             if (!usedColumns.contains(index)) {
                 allData[headIndex] = new JSONArray();
@@ -104,13 +105,22 @@ public class ExcelColumnMerger extends AbstractExcelOperator{
                     }
                 } catch (Exception ex) {
                     allData[headIndex].add("");
-                    System.out.println("Writing space");
                 }
-                initialData.put(cellName, allData[headIndex]);
+                if(initialData.keySet().contains(cellName)){
+                    initialData.put(cellName+"-"+dupIndex, allData[headIndex]);
+                }else{
+                    initialData.put(cellName, allData[headIndex]);
+                }
+                dupIndex++;
+                usedColumns.add(index);
+                allColumns.remove(index);
+                allColumns.add(index,"");
             }
+
         }
         fullData.put("unMergedData",initialData);
         excelOperator.setFinalData(fullData);
         excelField.setMergedColumns(mergedColumns);
+        excelField.setMerged(true);
     }
 }

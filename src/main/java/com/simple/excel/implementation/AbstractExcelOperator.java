@@ -3,24 +3,36 @@ package com.simple.excel.implementation;
 import com.simple.pozo.ExcelField;
 import org.json.simple.JSONObject;
 
-import javax.swing.*;
-
 /**
  * Author: SACHIN
  * Date: 3/23/2016.
  */
 public abstract class AbstractExcelOperator implements ExcelOperator{
 
-    public AbstractExcelOperator(JFrame frame){
-       new MenuBar().setMenuBar(frame);
+    protected JSONObject processedData = new JSONObject();
+
+    protected static ExcelOperator excelOperator;
+    protected static ExcelField excelField;
+
+
+    public static ExcelOperator getExcelOperator() {
+        return excelOperator;
     }
+
+    public static void setExcelOperator(ExcelOperator excelOperator){
+        AbstractExcelOperator.excelOperator = excelOperator;
+    }
+
+    public static void setExcelField(ExcelField excelField){
+        AbstractExcelOperator.excelField = excelField;
+    }
+
+    public static ExcelField getExcelField(){return excelField;}
 
     public AbstractExcelOperator(){}
 
-    protected JSONObject processedData = new JSONObject();
-
     @Override
-    public void processFile(ExcelField excelField) {}
+    public void processFile() {}
 
     @Override
     public JSONObject getFinalData() {
@@ -28,7 +40,7 @@ public abstract class AbstractExcelOperator implements ExcelOperator{
     }
 
     @Override
-    public void generateExcel(ExcelField excelField, ExcelOperator excelOperator,boolean merged){}
+    public void generateExcel(boolean merged){}
 
     @Override
     public void showProcessedData(){}

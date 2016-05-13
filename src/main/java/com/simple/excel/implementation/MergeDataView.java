@@ -1,6 +1,5 @@
 package com.simple.excel.implementation;
 
-import com.simple.pozo.ExcelField;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -14,8 +13,6 @@ import java.awt.*;
  */
 public class MergeDataView extends AbstractExcelOperator{
 
-    private ExcelField excelField;
-    private ExcelOperator excelOperator;
     private JTable table;
     private Object [][] cells;
     private String columns[];
@@ -26,10 +23,8 @@ public class MergeDataView extends AbstractExcelOperator{
     GridBagConstraints mergePanelConstraints;
 
 
-    public MergeDataView(ExcelField excelField,ExcelOperator excelOperator){
+    public MergeDataView(){
         frame = new JFrame();
-        this.excelField = excelField;
-        this.excelOperator = excelOperator;
         new MenuBar().setMenuBar(frame);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -41,7 +36,11 @@ public class MergeDataView extends AbstractExcelOperator{
     @Override
     public void showProcessedData(){
         addColumns();
-        cells = new Object[maxSize()][columns.length];
+        if(maxSize()==0){
+            cells = new Object[1][columns.length];
+        }else{
+            cells = new Object[maxSize()][columns.length];
+        }
         doDesign();
         processedData();
     }
@@ -100,8 +99,13 @@ public class MergeDataView extends AbstractExcelOperator{
     public void save(){
         ExcelOperator excelOperatorB = ExcelFactory.getObjectInstance("ExcelBuilder");
         if(excelOperatorB!=null){
-            excelOperatorB.generateExcel(excelField,excelOperator,true);
+            excelOperatorB.generateExcel(true);
         }
+        DatabaseOperator databaseOperator = DatabaseFactory.getObjectInstance("DatabaseMapper");
+        if (databaseOperator != null) {
+            databaseOperator.setDatabaseColumnMapping();
+        }
+        frame.dispose();
     }
 
     public void processedData(){

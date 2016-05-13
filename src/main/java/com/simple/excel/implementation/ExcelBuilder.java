@@ -22,16 +22,16 @@ public class ExcelBuilder extends AbstractExcelOperator{
 
 
     @Override
-    public void generateExcel(ExcelField excelField,ExcelOperator excelOperator,boolean merged) {
+    public void generateExcel(boolean merged) {
+
         String outputFileName = "Output-"+new Date().toString();
         JSONObject finalData = excelOperator.getFinalData();
         if(merged){
-            writeToExcel(outputFileName,excelField, (JSONObject) finalData.get("data"),merged);
+            writeToExcel(outputFileName,excelField, finalData,merged);
         }else{
             writeToExcel(outputFileName,excelField, (JSONObject) finalData.get("data"));
         }
     }
-
 
 
     public void writeToExcel(String outputFileName,ExcelField excelField,JSONObject finalData){
@@ -111,7 +111,7 @@ public class ExcelBuilder extends AbstractExcelOperator{
             }
         }
 
-        try (FileOutputStream outputStream = new FileOutputStream("output/finalResult.xlsx")) {
+        try (FileOutputStream outputStream = new FileOutputStream("finalResult.xlsx")) {
             workbook.write(outputStream);
             System.out.println("Successfully Completed");
         } catch (IOException e) {
@@ -120,6 +120,57 @@ public class ExcelBuilder extends AbstractExcelOperator{
     }
 
     public void writeToExcel(String outputFileName,ExcelField excelField,JSONObject finalData,boolean merged){
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("Sheet1");
+
+        int columnCount = 0,rowCount = 0;
+
+        Row headerRow = sheet.createRow(rowCount);
+
+        Row row=null;
+        int headColumn=0;
+        for(Object key:finalData.keySet()){
+            try {
+                JSONObject innerObject = (JSONObject) finalData.get(key);
+                for (Object cellName : innerObject.keySet()) {
+                    Cell headCell = headerRow.createCell(headColumn++);
+                    headCell.setCellValue(cellName.toString());
+                    rowCount = 1;
+                    try {
+                        JSONArray cellValues = (JSONArray) innerObject.get(cellName);
+                        for (Object val : cellValues) {
+                            row = sheet.getRow(rowCount);
+                            if (row == null) {
+                                row = sheet.createRow(rowCount);
+                            }
+                            Cell cell = row.createCell(columnCount);
+
+                            if (val instanceof Integer) {
+                                cell.setCellValue((int) val);
+                            } else if (val instanceof Double) {
+                                cell.setCellValue((Double) val);
+                            } else {
+                                cell.setCellValue(String.valueOf(val));
+                            }
+                            rowCount++;
+                        }
+                    }catch (Exception er){
+                        System.out.println("Getting cell value error");
+                    }
+                    columnCount++;
+                }
+            }catch (Exception er){
+                System.out.println("Exception getting json data");
+            }
+        }
+
+        try (FileOutputStream outputStream = new FileOutputStream("finalResultMerged.xlsx")) {
+            workbook.write(outputStream);
+            System.out.println("Successfully Completed");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
     }
 }

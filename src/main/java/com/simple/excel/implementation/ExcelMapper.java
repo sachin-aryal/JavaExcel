@@ -1,12 +1,7 @@
 package com.simple.excel.implementation;
 
-import com.simple.pozo.ExcelField;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -16,20 +11,17 @@ import java.util.Map;
  */
 public class ExcelMapper extends AbstractExcelOperator{
 
-    File file[];
     JPanel panel;
     JTextField columnName[];
     JComboBox<String> columnType[];
     JLabel columnNameLabel;
     JButton mapButton;
     JButton processFileButton;
-    private ExcelField excelField;
     JPanel mainPanel;
     JFrame frame;
 
-    public ExcelMapper(ExcelField excelField){
+    public ExcelMapper(){
         frame = new JFrame();
-        this.excelField = excelField;
         frame.setTitle("Excel Mapper");
         new MenuBar().setMenuBar(frame);
         frame.setLayout(new BorderLayout());
@@ -82,19 +74,11 @@ public class ExcelMapper extends AbstractExcelOperator{
         cons.insets=new Insets(20,0,0,0);
         processFileButton = new JButton("Process File");
         panel.add(processFileButton,cons);
-        processFileButton.setVisible(false);
-        processFileButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new StartBuilder().startProcess(excelField,frame);
-            }
-        });
-        mapButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-               setMapping();
-                processFileButton.setVisible(true);
-            }
+        processFileButton.setEnabled(false);
+        processFileButton.addActionListener(e -> new StartBuilder().startProcess(frame));
+        mapButton.addActionListener(e-> {
+            setMapping();
+            processFileButton.setEnabled(true);
         });
 
         panel.setBorder(BorderFactory.createTitledBorder("Columns List"));

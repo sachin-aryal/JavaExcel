@@ -12,8 +12,16 @@ public class ExcelField {
     private File file[];
     private Map<String,String> columnMaps;
     List<String> mergedColumns;
-
     private int totalColumn;
+    boolean isMerged=false;
+
+    public boolean isMerged() {
+        return isMerged;
+    }
+
+    public void setMerged(boolean merged) {
+        isMerged = merged;
+    }
 
     public List<String> getMergedColumns() {
         return mergedColumns;

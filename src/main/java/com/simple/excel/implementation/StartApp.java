@@ -5,8 +5,6 @@ import com.simple.pozo.ExcelField;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 
 /**
@@ -69,18 +67,8 @@ public class StartApp extends JFrame {
         mainConstraints.gridy=0;
         mainPanel.add(panel,mainConstraints);
         add(mainPanel);
-        fileSelector.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                chooseFiles();
-            }
-        });
-        submitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                moveToMapper();
-            }
-        });
+        fileSelector.addActionListener(e -> chooseFiles());
+        submitButton.addActionListener(e -> moveToMapper());
 
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setVisible(true);
@@ -118,7 +106,8 @@ public class StartApp extends JFrame {
     public void moveToMapper(){
         int totalColumns = Integer.parseInt(columnNumbers.getText());
         excelp.setTotalColumn(totalColumns);
-        new ExcelMapper(excelp);
+        AbstractExcelOperator.setExcelField(excelp);
+        new ExcelMapper();
         this.dispose();
     }
 

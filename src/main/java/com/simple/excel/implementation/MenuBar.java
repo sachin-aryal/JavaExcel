@@ -1,8 +1,7 @@
 package com.simple.excel.implementation;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 
 /**
  * Author: SACHIN
@@ -19,19 +18,13 @@ public class MenuBar {
         JMenuItem exitItem = new JMenuItem("Exit");
         homeMenu.add(homeItem);
         homeMenu.add(exitItem);
-        homeItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                frame.dispose();
-                new StartApp();
-            }
+        homeItem.addActionListener(e -> {
+            frame.dispose();
+            new StartApp();
         });
-        exitItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
+        exitItem.addActionListener(e-> System.exit(0));
+        menubar.setPreferredSize(new Dimension(frame.getWidth(),50));
+        menubar.setBackground(new Color(121, 131, 255));
         frame.setJMenuBar(menubar);
     }
 }

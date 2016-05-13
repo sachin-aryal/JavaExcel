@@ -1,6 +1,5 @@
 package com.simple.excel.implementation;
 
-import com.simple.pozo.ExcelField;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -18,20 +17,15 @@ import java.util.Iterator;
  */
 public class DataViewer extends AbstractExcelOperator{
 
-    private ExcelField excelField;
-    private ExcelOperator excelOperator;
     private JTable table;
     private Object [][] cells;
     private String columns[];
     private JFrame frame;
-    private JTextField columnNumber[];
     private JTextField columnsToBeMerged;
     private JPanel mainPanel;
 
 
-    public DataViewer(ExcelField excelField, ExcelOperator excelOperator){
-        this.excelField=excelField;
-        this.excelOperator=excelOperator;
+    public DataViewer(){
         this.frame = new JFrame();
         new MenuBar().setMenuBar(frame);
         showProcessedData();
@@ -51,7 +45,11 @@ public class DataViewer extends AbstractExcelOperator{
                 j++;
             }
         }
-        cells = new Object[maxSize()][totalColumns];
+        if(maxSize()==0){
+            cells = new Object[1][totalColumns];
+        }else{
+            cells = new Object[maxSize()][totalColumns];
+        }
         processedData();
        doDesign();
     }
@@ -63,6 +61,7 @@ public class DataViewer extends AbstractExcelOperator{
         GridBagConstraints mainConstraints = new GridBagConstraints();
 
         JPanel tablePanel = new JPanel();
+
         table = new JTable(cells,columns);
         table.setDragEnabled(false);
         JScrollPane tableScroll = new JScrollPane(table);
@@ -110,6 +109,13 @@ public class DataViewer extends AbstractExcelOperator{
         JPanel processDataPanel = new JPanel();
         JButton processToDatabaseButton = new JButton("Save");
         processDataPanel.add(processToDatabaseButton);
+        processToDatabaseButton.addActionListener(e->{
+            DatabaseOperator databaseOperator = DatabaseFactory.getObjectInstance("DatabaseMapper");
+            if (databaseOperator != null) {
+                databaseOperator.setDatabaseColumnMapping();
+            }
+            frame.dispose();
+        });
 
         mainConstraints.gridx=0;
         mainConstraints.gridy=0;
@@ -142,34 +148,33 @@ public class DataViewer extends AbstractExcelOperator{
 
     public void moveToColumnMerger(){
         String columnsToBeMergedText = columnsToBeMerged.getText();
-        new ExcelColumnMerger(excelOperator,excelField,columnsToBeMergedText).mergeColumns();
-        new MergeDataView(excelField,excelOperator).showProcessedData();
+        new BackGroundProcessor("mergeColumns",frame).processInBack(columnsToBeMergedText);
+        new MergeDataView().showProcessedData();
         frame.dispose();
     }
 
-    public void processedData(){
+    public void processedData() {
 
         JSONObject data = excelOperator.getFinalData();
         JSONObject finalData = (JSONObject) data.get("data");
-        int row=0,col=0;
+        int row = 0, col = 0;
         for (File file : excelField.getFile()) {
             for (String cellName : excelField.getColumnMaps().keySet()) {
-                row=0;
+                row = 0;
                 JSONObject fileJson = (JSONObject) finalData.get(file.getName());
                 JSONArray allCellData = (JSONArray) fileJson.get(cellName);
                 try {
                     Iterator<String> iterator = allCellData.iterator();
                     while (iterator.hasNext()) {
-                       cells[row][col]=iterator.next();
+                        cells[row][col] = iterator.next();
                         row++;
                     }
-                }catch (NullPointerException ex){
-                    cells[row][col]="";
+                } catch (Exception ex) {
+                    cells[row][col] = "";
                 }
                 col++;
             }
         }
-
     }
 
     public void questionDialogue(){
@@ -184,6 +189,7 @@ public class DataViewer extends AbstractExcelOperator{
     public int maxSize(){
         int maxSize=0;
         JSONObject data = excelOperator.getFinalData();
+        System.out.println("Data is "+data);
         JSONObject finalData = (JSONObject) data.get("data");
         for (File file : excelField.getFile()) {
             for (String cellName : excelField.getColumnMaps().keySet()) {

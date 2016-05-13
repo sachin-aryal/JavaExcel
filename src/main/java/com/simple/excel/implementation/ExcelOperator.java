@@ -1,6 +1,5 @@
 package com.simple.excel.implementation;
 
-import com.simple.pozo.ExcelField;
 import org.json.simple.JSONObject;
 
 /**
@@ -9,11 +8,11 @@ import org.json.simple.JSONObject;
  */
 public interface ExcelOperator {
 
-    void processFile(ExcelField excelField);
+    void processFile();
 
     JSONObject getFinalData();
 
-    void generateExcel(ExcelField excelField, ExcelOperator excelOperator,boolean merged);
+    void generateExcel(boolean merged);
 
     void showProcessedData();
 

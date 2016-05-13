@@ -1,7 +1,5 @@
 package com.simple.excel.implementation;
 
-import com.simple.pozo.ExcelField;
-
 import javax.swing.*;
 
 /**
@@ -10,20 +8,9 @@ import javax.swing.*;
  */
 public class StartBuilder {
 
-    public void startProcess(ExcelField excelField,JFrame frame){
-
-        new DialogueBuilder("progressBar",frame).showWaitDialogue();
-
-        ExcelOperator excelOperator = ExcelFactory.getObjectInstance("ExcelReader");
-        if (excelOperator != null) {
-            excelOperator.processFile(excelField);
-        }
-
-        ExcelOperator excelOperatorB = ExcelFactory.getObjectInstance("ExcelBuilder");
-        if(excelOperatorB!=null){
-            excelOperatorB.generateExcel(excelField,excelOperator,false);
-        }
-        new DataViewer(excelField,excelOperator);
+    public void startProcess(JFrame frame){
+        new BackGroundProcessor("progressBar",frame).processInBack();
+        new DataViewer();
         frame.dispose();
     }
 }
